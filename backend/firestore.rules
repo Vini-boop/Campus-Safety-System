@@ -1,0 +1,222 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ────────────────────────────────────────────────────────────────
+    function isAuth()    { return request.auth != null; }
+    // Safe role() — returns empty string if custom claim not set yet (new users)
+    function role()      { return request.auth.token.get('role', ''); }
+    function isAdmin()   { return role() in ['admin', 'superadmin', 'security_admin']; }
+    function isSecurity(){ return role() in ['admin', 'superadmin', 'security_admin', 'security']; }
+    function isMedical() { return role() in ['admin', 'superadmin', 'medical', 'security_admin']; }
+    function isStudent() { return role() == 'student' || role() == ''; }
+    function isDriver()  { return role() == 'driver'; }
+    function isDoctor()  { return role() in ['admin', 'superadmin', 'medical']; }
+    function isOwner(uid){ return request.auth.uid == uid; }
+
+    // ── Users ──────────────────────────────────────────────────────────────────
+    match /users/{userId} {
+      allow read:   if isAuth();
+      allow create: if isAuth();
+      // Admin can update any field.
+      // User can update their own doc ONLY if not yet approved (not sealed).
+      // Once isApproved == true, only admins may write.
+      allow update: if isAuth() && (
+        isAdmin() ||
+        (isOwner(userId) && resource.data.get('isApproved', false) == false)
+      );
+      allow delete: if isAdmin();
+    }
+
+    // ── Medical Reports ────────────────────────────────────────────────────────
+    match /medical_reports/{reportId} {
+      allow read:   if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth() && (
+        isMedical() ||
+        (isStudent() && resource.data.reporterId == request.auth.uid)
+      );
+      allow delete: if isAdmin();
+    }
+
+    // ── Ambulance Requests (from mobile AmbulanceRequestForm) ─────────────────
+    match /ambulance_requests/{requestId} {
+      allow create: if isAuth();
+      allow read:   if isAuth() && (
+        isMedical() ||
+        resource.data.studentId == request.auth.uid
+      );
+      allow update: if isAuth() && (isMedical() || isDriver());
+      allow delete: if isAdmin();
+    }
+
+    // ── Ambulances ─────────────────────────────────────────────────────────────
+    match /ambulances/{ambulanceId} {
+      allow read:   if isAuth();
+      allow create: if isAdmin();
+      allow update: if isAdmin() || isDriver();
+      allow delete: if isAdmin();
+
+      match /location_history/{pointId} {
+        allow read:   if isAuth() && isMedical();
+        allow create: if isAuth() && isDriver();
+      }
+    }
+
+    // ── Dispatch Logs ──────────────────────────────────────────────────────────
+    match /ambulance_dispatches/{dispatchId} {
+      allow read:   if isAuth() && (isMedical() || isDriver());
+      allow create: if isAuth() && isMedical();
+      allow update: if isAuth() && (isMedical() || isDriver());
+    }
+
+    // ── Doctor-Student Consultation Chats ──────────────────────────────────────
+    match /medical_chats/{chatId} {
+      allow read:   if isAuth();
+      allow create: if isAuth() && isStudent();
+      allow update: if isAuth() && (
+        isMedical() || isOwner(resource.data.studentId)
+      );
+
+      match /messages/{messageId} {
+        allow read:   if isAuth();
+        allow create: if isAuth();
+      }
+    }
+
+    match /medical_messages/{messageId} {
+      allow read:   if isAuth();
+      allow create: if isAuth();
+    }
+
+    // ── Health Alerts ──────────────────────────────────────────────────────────
+    match /health_alerts/{alertId} {
+      allow read:   if isAuth();
+      allow create: if isAuth() && isMedical();
+      allow update: if isAuth() && isMedical();
+      allow delete: if isAdmin();
+    }
+
+    // ── Health Advisories ──────────────────────────────────────────────────────
+    match /health_advisories/{advisoryId} {
+      allow read:   if isAuth();
+      allow create: if isAuth() && isDoctor();
+      allow update: if isAuth() && isDoctor();
+      allow delete: if isAdmin();
+    }
+
+    // ── Notifications ──────────────────────────────────────────────────────────
+    match /notifications/{notifId} {
+      // Any authenticated user can read — client-side filters by userId
+      allow read:   if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow delete: if isAuth() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+    }
+
+    // ── Security Reports ──────────────────────────────────────────────────────
+    match /reports/{id} {
+      allow create: if isAuth();
+      allow read:   if isAuth();
+      allow update: if isAuth() && isSecurity();
+    }
+
+    // ── Risk Events ────────────────────────────────────────────────────────────
+    match /risk_events/{riskId} {
+      allow read:  if isAuth();
+      allow write: if isAuth() && isMedical();
+    }
+
+    // ── Analytics ──────────────────────────────────────────────────────────────
+    match /analytics_daily_reports/{date} {
+      allow read:  if isAuth() && isMedical();
+      allow write: if isAuth() && isAdmin();
+    }
+
+    // ── Emergencies ────────────────────────────────────────────────────────────
+    match /emergencies/{emergencyId} {
+      allow create: if isAuth();
+      allow read: if isAuth() && (
+        isSecurity() ||
+        isMedical() ||
+        resource.data.userId == request.auth.uid
+      );
+      allow update: if isAuth() && (isSecurity() || isMedical());
+      allow delete: if isAdmin();
+    }
+
+    match /medical_requests/{document} {
+      allow read:  if isAuth();
+      allow write: if isAuth();
+    }
+    match /security_alerts/{document} {
+      allow read:  if isAuth();
+      allow write: if isAuth();
+    }
+    // ── Security Reports (from mobile report screen) ───────────────────────────
+    match /security_reports/{document} {
+      // Any authenticated user can read/list — dashboard login is the gate
+      allow read:   if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth();
+      allow delete: if isAdmin();
+    }
+    // ── Security OB Logs ───────────────────────────────────────────────────────
+    match /security_ob_logs/{document} {
+      // Any authenticated user can read/list — dashboard login is the gate
+      allow read:   if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth();
+      allow delete: if isAdmin();
+    }
+    // ── Verification Requests ─────────────────────────────────────────────────
+    match /verification_requests/{requestId} {
+      allow create: if isAuth();
+      allow read:   if isAuth() && (
+        resource.data.userId == request.auth.uid || isSecurity()
+      );
+      allow update: if isAuth() && isSecurity();
+      allow delete: if isAdmin();
+    }
+    match /weather_updates/{document} {
+      allow read:  if isAuth();
+      allow write: if isAuth() && isAdmin();
+    }
+    match /movement_alerts/{document} {
+      allow read:  if isAuth();
+      allow write: if isAuth() && isSecurity();
+    }
+    match /logs/{document} {
+      allow read, write: if isAuth() && isAdmin();
+    }
+    match /audit_logs/{document} {
+      allow read:  if isAuth() && isAdmin();
+      allow create: if isAuth() && isAdmin();
+    }
+    match /system_status/{document} {
+      allow read:  if isAuth();
+      allow write: if isAuth() && isSecurity();
+    }
+    match /alerts/{document} {
+      allow read:  if isAuth();
+      allow write: if isAuth() && isSecurity();
+    }
+    match /safety_tips/{document} {
+      allow read:  if isAuth();
+      allow write: if isAuth() && isSecurity();
+    }
+    match /risk_zones/{document} {
+      allow read:  if isAuth();
+      allow write: if isAuth() && isSecurity();
+    }
+    match /area_alerts/{document} {
+      allow read:  if isAuth();
+      allow write: if isAuth() && isSecurity();
+    }
+  }
+}
+

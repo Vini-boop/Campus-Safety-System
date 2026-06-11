@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Health Advisory Broadcast</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #1565C0;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background: #1565C0;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #0D47A1;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .status.success {
+            background: #E8F5E9;
+            color: #2E7D32;
+            border: 1px solid #4CAF50;
+            display: block;
+        }
+
+        .status.error {
+            background: #FFEBEE;
+            color: #C62828;
+            border: 1px solid #F44336;
+            display: block;
+        }
+
+        .status.info {
+            background: #E3F2FD;
+            color: #1565C0;
+            border: 1px solid #2196F3;
+            display: block;
+        }
+
+        .instructions {
+            background: #FFF3E0;
+            border: 1px solid #FFB74D;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .instructions h3 {
+            margin-top: 0;
+            color: #E65100;
+        }
+
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🏥 Test Health Advisory Broadcast</h1>
+        <p class="subtitle">Test the medical dashboard broadcast functionality</p>
+
+        <div class="instructions">
+            <h3>📋 Instructions:</h3>
+            <ol>
+                <li>Make sure you're logged in to the admin dashboard in another tab</li>
+                <li>Fill in the form below with test data</li>
+                <li>Click "Send Test Broadcast"</li>
+                <li>Check the mobile app home screen for the notification</li>
+                <li>Check the Medical Dashboard → Broadcast tab for the active advisory</li>
+            </ol>
+        </div>
+
+        <div id="status" class="status"></div>
+
+        <form id="broadcastForm">
+            <div class="form-group">
+                <label for="message">Message *</label>
+                <textarea id="message" required
+                    placeholder="Enter health advisory message...">⚠️ Test broadcast: This is a test health advisory. Please ignore.</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="severity">Severity *</label>
+                <select id="severity" required>
+                    <option value="info">💡 Info</option>
+                    <option value="warning" selected>⚠️ Warning</option>
+                    <option value="critical">🚨 Critical</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="targetAudience">Target Audience *</label>
+                <select id="targetAudience" required>
+                    <option value="all" selected>All Students</option>
+                    <option value="location">Specific Location</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="locationGroup" style="display: none;">
+                <label for="targetLocation">Target Location</label>
+                <input type="text" id="targetLocation" placeholder="e.g., Mandela Hall, Cherika Junction">
+            </div>
+
+            <div class="form-group">
+                <label for="expiresIn">Expires In (hours) *</label>
+                <select id="expiresIn" required>
+                    <option value="1">1 hour</option>
+                    <option value="6">6 hours</option>
+                    <option value="24" selected>24 hours</option>
+                    <option value="48">48 hours</option>
+                </select>
+            </div>
+
+            <button type="submit" id="submitBtn">📢 Send Test Broadcast</button>
+        </form>
+    </div>
+
+    <script type="module">
+        // This is a test page - in production, use the actual BroadcastPanel component
+
+        const form = document.getElementById('broadcastForm');
+        const statusDiv = document.getElementById('status');
+        const submitBtn = document.getElementById('submitBtn');
+        const targetAudienceSelect = document.getElementById('targetAudience');
+        const locationGroup = document.getElementById('locationGroup');
+
+        // Show/hide location field
+        targetAudienceSelect.addEventListener('change', (e) => {
+            locationGroup.style.display = e.target.value === 'location' ? 'block' : 'none';
+        });
+
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const message = document.getElementById('message').value.trim();
+            const severity = document.getElementById('severity').value;
+            const targetAudience = document.getElementById('targetAudience').value;
+            const targetLocation = document.getElementById('targetLocation').value.trim();
+            const expiresIn = parseInt(document.getElementById('expiresIn').value);
+
+            if (!message) {
+                showStatus('❌ Please enter a message', 'error');
+                return;
+            }
+
+            if (targetAudience === 'location' && !targetLocation) {
+                showStatus('❌ Please enter a target location', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = '📡 Sending...';
+            showStatus('📡 Sending broadcast to Firestore...', 'info');
+
+            try {
+                // Note: This test page assumes you're logged in to the admin dashboard
+                // In production, this would use the broadcastAdvisory function from riskService
+
+                showStatus(
+                    `✅ Test configuration valid!\n\n` +
+                    `Message: ${message.substring(0, 50)}...\n` +
+                    `Severity: ${severity}\n` +
+                    `Target: ${targetAudience === 'all' ? 'All Students' : targetLocation}\n` +
+                    `Expires: ${expiresIn} hours\n\n` +
+                    `To actually send, use the Medical Dashboard → Broadcast tab.`,
+                    'success'
+                );
+
+                console.log('Test broadcast configuration:', {
+                    message,
+                    severity,
+                    targetAudience,
+                    targetLocation: targetAudience === 'location' ? targetLocation : null,
+                    expiresAt: new Date(Date.now() + expiresIn * 3600000),
+                });
+
+            } catch (error) {
+                console.error('Test error:', error);
+                showStatus(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '📢 Send Test Broadcast';
+            }
+        });
+
+        // Show initial info
+        showStatus('ℹ️ Fill in the form and click "Send Test Broadcast" to test the configuration', 'info');
+    </script>
+</body>
+
+</html>

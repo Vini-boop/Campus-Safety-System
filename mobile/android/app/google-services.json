@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "796748500304",
+    "project_id": "safety-management-system-4faf0",
+    "storage_bucket": "safety-management-system-4faf0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:796748500304:android:f7968bf4b6b8d447edb055",
+        "android_client_info": {
+          "package_name": "com.campussafety.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "796748500304-5ua8hqd6lqoghi1pq8k38v28ahs4ec6d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFez_RmaGv2mPlfAwWf1ovWYh-cmQMWow"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "796748500304-5ua8hqd6lqoghi1pq8k38v28ahs4ec6d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
