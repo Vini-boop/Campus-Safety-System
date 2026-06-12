@@ -1,39 +1,22 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-
-  <!-- ── Location ─────────────────────────────────────────────────────────── -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
   <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
   <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
-
-  <!-- ── Network ──────────────────────────────────────────────────────────── -->
   <uses-permission android:name="android.permission.INTERNET"/>
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-
-  <!-- ── Notifications ────────────────────────────────────────────────────── -->
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
   <uses-permission android:name="android.permission.VIBRATE"/>
-
-  <!-- ── Camera / Media ───────────────────────────────────────────────────── -->
   <uses-permission android:name="android.permission.CAMERA"/>
   <uses-permission android:name="android.permission.RECORD_AUDIO"/>
   <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
   <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
   <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
   <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED"/>
-  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-      android:maxSdkVersion="32"
-      tools:replace="android:maxSdkVersion"/>
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-      android:maxSdkVersion="32"
-      tools:replace="android:maxSdkVersion"/>
-
-  <!-- ── System ───────────────────────────────────────────────────────────── -->
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" tools:replace="android:maxSdkVersion"/>
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="32" tools:replace="android:maxSdkVersion"/>
   <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
   <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
-
-  <!-- ── Queries (required for Android 11+ intent visibility) ─────────────── -->
   <queries>
     <intent>
       <action android:name="android.intent.action.VIEW"/>
@@ -49,68 +32,23 @@
       <data android:scheme="google.navigation"/>
     </intent>
   </queries>
-
-  <application
-      android:name=".MainApplication"
-      android:label="@string/app_name"
-      android:icon="@mipmap/ic_launcher"
-      android:roundIcon="@mipmap/ic_launcher_round"
-      android:allowBackup="true"
-      android:theme="@style/AppTheme"
-      android:supportsRtl="true"
-      android:enableOnBackInvokedCallback="false"
-      android:requestLegacyExternalStorage="true"
-      android:usesCleartextTraffic="true">
-
-    <!-- ── Google Maps API Key ─────────────────────────────────────────────── -->
-    <!-- Used by react-native-maps (Maps SDK for Android) -->
-    <!-- SHA-1 of debug keystore: 5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25 -->
-    <!-- Package: com.campussafety.app -->
-    <!-- If still black: ensure Maps SDK for Android is enabled for this key in Google Cloud Console -->
-    <meta-data
-        android:name="com.google.android.geo.API_KEY"
-        android:value="AIzaSyAFez_RmaGv2mPlfAwWf1ovWYh-cmQMWow"/>
-    <!-- ── Google Play Services version check ────────────────────────────── -->
-    <meta-data
-        android:name="com.google.android.gms.version"
-        android:value="@integer/google_play_services_version"/>
-
-    <!-- ── Firebase Cloud Messaging ──────────────────────────────────────── -->
-    <meta-data
-        android:name="com.google.firebase.messaging.default_notification_color"
-        android:resource="@color/notification_icon_color"
-        tools:replace="android:resource"/>
-    <meta-data
-        android:name="com.google.firebase.messaging.default_notification_icon"
-        android:resource="@drawable/notification_icon"/>
-
-    <!-- ── Expo Notifications ─────────────────────────────────────────────── -->
-    <meta-data
-        android:name="expo.modules.notifications.default_notification_color"
-        android:resource="@color/notification_icon_color"/>
-    <meta-data
-        android:name="expo.modules.notifications.default_notification_icon"
-        android:resource="@drawable/notification_icon"/>
-
-    <!-- ── Expo Updates (disabled) ───────────────────────────────────────── -->
-    <meta-data android:name="expo.modules.updates.ENABLED" android:value="false"/>
+  <application android:name=".MainApplication" android:label="@string/app_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:allowBackup="true" android:theme="@style/AppTheme" android:supportsRtl="true" android:enableOnBackInvokedCallback="false" android:requestLegacyExternalStorage="true" android:usesCleartextTraffic="true">
+    <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyAFez_RmaGv2mPlfAwWf1ovWYh-cmQMWow"/>
+    <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
+    <meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/notification_icon_color" tools:replace="android:resource"/>
+    <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/notification_icon"/>
+    <meta-data android:name="expo.modules.notifications.default_notification_color" android:resource="@color/notification_icon_color"/>
+    <meta-data android:name="expo.modules.notifications.default_notification_icon" android:resource="@drawable/notification_icon"/>
+    <meta-data android:name="expo.modules.updates.ENABLED" android:value="true"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0"/>
-
-    <!-- ── Main Activity ─────────────────────────────────────────────────── -->
-    <activity
-        android:name=".MainActivity"
-        android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|uiMode|smallestScreenSize"
-        android:launchMode="singleTask"
-        android:windowSoftInputMode="adjustResize"
-        android:theme="@style/Theme.App.SplashScreen"
-        android:exported="true"
-        android:screenOrientation="portrait">
+    <meta-data android:name="expo.modules.updates.EXPO_UPDATE_URL" android:value="https://u.expo.dev/a7ab9d0c-86d3-49f9-a588-27478a28ccc3"/>
+    <meta-data android:name="expo.modules.updates.EXPO_RUNTIME_VERSION" android:value="@string/expo_runtime_version"/>
+    <activity android:name=".MainActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|uiMode|smallestScreenSize" android:launchMode="singleTask" android:windowSoftInputMode="adjustResize" android:theme="@style/Theme.App.SplashScreen" android:exported="true" android:screenOrientation="portrait">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
         <category android:name="android.intent.category.LAUNCHER"/>
       </intent-filter>
-      <!-- Deep link scheme -->
       <intent-filter>
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
@@ -118,9 +56,6 @@
         <data android:scheme="campus-safety"/>
       </intent-filter>
     </activity>
-
-    <!-- Legacy HTTP support -->
     <uses-library android:name="org.apache.http.legacy" android:required="false"/>
-
   </application>
 </manifest>
