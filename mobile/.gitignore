@@ -40,4 +40,5 @@ app-example
 
 # generated native folders
 /ios
-/android
+# android is tracked for EAS builds (gradle.properties, google-services.json, etc.)
+# /android
